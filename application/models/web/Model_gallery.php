@@ -1,0 +1,124 @@
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+class Model_gallery extends CI_Model {
+
+    function __construct()
+    {
+        parent::__construct();
+    }
+
+    
+     function getListGalleryALL($cond = null, $type){
+		  $query	    = "SELECT a.module_name, a.module_id, "
+                                    . " a.module_order_value, a.module_active_status "                               
+                                    . " FROM tbl_module as a "
+                                    . " ".$cond;
+		 $query = $this->db->query($query)->result_array();
+                    $ars  = array();
+                    $data  = array();
+                    $i=0; foreach ($query as $row) {  $i++; 
+                       $gallery = array();
+                        $data  = array();
+                       $gallery[$i] = $this->getGalleryMod($row['module_id'],$type);
+                        if (!empty($gallery[$i] )) {
+                             $ars[] = array(
+                                'gallery_id' => $row['module_id'],
+                                'gallery_title' => $row['module_name'],
+                                'module_id' => $row['module_id'],
+                                'gallery' => $gallery[$i]
+                            );  
+                        }
+                        if (empty($ars[$i]) ){
+                             $data=$ars;
+                        }
+                      }
+            $this->db->close();
+            return $data;
+	} 
+     function getGalleryMod($module_id,$type){
+
+		 $sql	 = "SELECT a.list_gallery_id, a.gallery_type, a.list_gallery_title,a.list_gallery_image, a.list_gallery_url, "
+                                    . " a.list_gallery_active_status "
+                                    . "FROM tbl_list_gallery as a "
+                                    . " inner join tbl_gallery as b on a.gallery_id = b.gallery_id "
+                                    . " where a.list_gallery_active_status =1 and b.module_id=".$module_id." and a.gallery_type=".$type." "
+                         . " and b.gallery_id NOT IN (12,13,16,18,19,20,21,22,23,33,34,35 )order by a.list_gallery_order, b.module_id ASC" ;     
+
+		$query		= $this->db->query($sql)->result_array();
+                $data  = array();
+                $i=0; foreach ($query as $row) {  $i++; 
+                      
+                         $data[] = array(
+                                'list_gallery_id' => $row['list_gallery_id'],
+                                'list_gallery_image' => $row['list_gallery_image'],
+                                'list_gallery_title' => $row['list_gallery_title'],
+                                'list_gallery_url' => $row['list_gallery_url']
+                            );
+                        
+                      }
+                
+                
+                
+		return $data;
+
+	} 
+    
+
+     function getListGallery($cond = null, $type){
+		  $query	    = "SELECT a.gallery_id, a.module_id, a.gallery_title,"
+                                    . " a.gallery_order, a.gallery_active_status,"
+                                    . " b.module_name "                                  
+                                    . "FROM tbl_gallery as a "
+                                    . " inner join tbl_module as b on a.module_id=b.module_id  "
+                                    . " ".$cond;
+		 $query = $this->db->query($query)->result_array();
+                    $ars  = array();
+                    $data  = array();
+                    $i=0; foreach ($query as $row) {  $i++; 
+                       $gallery = array();
+                        $data  = array();
+                       $gallery[$i] = $this->getGallery($row['gallery_id'],$type);
+                        if (!empty($gallery[$i] )) {
+                             $ars[] = array(
+                                'gallery_id' => $row['gallery_id'],
+                                'gallery_title' => $row['gallery_title'],
+                                'module_id' => $row['module_id'],
+                                'gallery' => $gallery[$i]
+                            );  
+                        }
+                        if (empty($ars[$i]) ){
+                             $data=$ars;
+                        }
+                      }
+            $this->db->close();
+            return $data;
+	} 
+      function getGallery($gallery_id,$type){
+
+		 $sql	 = "SELECT a.list_gallery_id, a.gallery_type, a.list_gallery_title,a.list_gallery_image, a.list_gallery_url, "
+                                    . " a.list_gallery_active_status "
+                                    . "FROM tbl_list_gallery as a "
+                                    . " inner join tbl_gallery as b on a.gallery_id = b.gallery_id "
+                                    . " where a.list_gallery_active_status =1 and a.gallery_id=".$gallery_id." and a.gallery_type=".$type." "
+									. "order by a.list_gallery_order ASC" ;   
+
+		$query		= $this->db->query($sql)->result_array();
+                $data  = array();
+                $i=0; foreach ($query as $row) {  $i++; 
+                      
+                         $data[] = array(
+                                'list_gallery_id' => $row['list_gallery_id'],
+                                'list_gallery_image' => $row['list_gallery_image'],
+                                'list_gallery_title' => $row['list_gallery_title'],
+                                'list_gallery_url' => $row['list_gallery_url']
+                            );
+                        
+                      }
+                
+                
+                
+		return $data;
+
+	} 
+
+}
